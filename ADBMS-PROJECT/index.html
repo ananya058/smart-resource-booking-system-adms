@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FSET Resource Booking System</title>
+
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-success">
+  <div class="container">
+    <a class="navbar-brand fw-bold">University of Science & Technology Chattogram, FSET</a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto">
+
+        <li class="nav-item"><a class="nav-link" href="#home" onclick="showHome()">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="#" onclick="document.getElementById('aboutBtn').click()">About</a></li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Department</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#" onclick="showDepartment('cse')">CSE</a></li>
+            <li><a class="dropdown-item" href="#" onclick="showDepartment('eee')">EEE</a></li>
+            <li><a class="dropdown-item" href="#" onclick="showDepartment('ete')">ETE</a></li>
+          </ul>
+        </li>
+
+        <li class="nav-item"><a class="nav-link" href="#" onclick="document.getElementById('bookBtn').click()">Room Booking</a></li>
+
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- HOME -->
+<div class="container text-center mt-5" id="home">
+  <h1 class="text-success fw-bold">Faculty of Science, Engineering & Technology</h1>
+  <p>Smart system for booking classrooms and labs efficiently.</p>
+  <button id="bookBtn" class="btn btn-success btn-lg mt-4">Book a Room</button>
+</div>
+
+<!-- ABOUT -->
+<div class="container mt-5" id="about" style="display: none;">
+  <h3>About</h3>
+  <p>This system allows faculty members to book rooms, labs and avoid scheduling conflicts.</p>
+</div>
+
+<button id="aboutBtn" style="display: none;"></button>
+
+<!-- DEPARTMENT COURSE OFFERING -->
+<div class="container mt-5" id="departmentSection" style="display: none;">
+  <div class="department-intro p-4 rounded-4 shadow-sm bg-white mb-4" id="departmentIntro"></div>
+  <div class="department-header p-4 rounded-4 shadow-sm bg-white">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+      <div>
+        <p class="text-secondary mb-1 small">Department of Computer Science & Engineering</p>
+        <h3 class="text-success mb-1" id="departmentTitle">Course of study</h3>
+        <p class="mb-0 text-muted" id="departmentSubtitle">Select a department to view its course offering list.</p>
+      </div>
+      <span class="badge bg-success bg-opacity-15 text-success py-2 px-4" id="departmentBadge">CSE</span>
+    </div>
+  </div>
+
+  <div class="dept-grid mt-4" id="departmentContent"></div>
+</div>
+
+<!-- ROOM BOOKING -->
+<div class="container mt-5" id="roomBooking" style="display: none;">
+
+  <h3 class="text-center text-success mb-4">FSET Room Booking System</h3>
+
+  <form id="bookingForm" class="card p-4">
+
+    <div class="mb-3">
+      <label>Room</label>
+      <select id="resource" class="form-control" required>
+        <option value="">Select Room</option>
+        <option>Room 107</option>
+        <option>Room 307</option>
+        <option>Lab 401</option>
+        <option>Lab 402</option>
+        <option>Lab 403</option>
+        <option>Lab 404</option>
+        <option>Room 1403</option>
+        <option>Room 1404</option>
+        <option>Room 1405</option>
+        <option>Room 1407</option>
+        <option>Room 1503</option>
+        <option>Room 1504</option>
+        <option>Room 1505</option>
+        <option>Room 1507</option>
+        <option>Room 1603</option>
+        <option>Room 1604</option>
+        <option>Room 1605</option>
+        <option>Room 1607</option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label>Faculty Name</label>
+      <input type="text" id="user" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label>Purpose</label>
+      <select id="purpose" class="form-control">
+        <option>Class</option>
+        <option>Lab</option>
+        <option>Meeting</option>
+        <option>Exam</option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label>Start Time</label>
+      <input type="datetime-local" id="startTime" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label>End Time</label>
+      <input type="datetime-local" id="endTime" class="form-control" required>
+    </div>
+
+    <button type="submit" class="btn btn-success">Book Room</button>
+
+  </form>
+
+  <h4 class="mt-5">Booking Records</h4>
+
+  <table class="table table-bordered mt-3">
+    <thead>
+      <tr>
+        <th>Room</th>
+        <th>Faculty</th>
+        <th>Purpose</th>
+        <th>Start</th>
+        <th>End</th>
+      </tr>
+    </thead>
+    <tbody id="bookingTable"></tbody>
+  </table>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="footer mt-5 py-5 bg-dark text-white text-center">
+  <div class="container">
+    <div class="footer-logo mb-4">
+      <h5 class="fw-bold">University of Science and Technology Chittagong</h5>
+      <p class="mb-2">(USTC)</p>
+    </div>
+
+    <div class="footer-info">
+      <p class="mb-2"><strong>EIIN:</strong> I36638</p>
+      <p class="mb-2">Foy's Lake, Zakir Hossain Road Chattogram 4202.</p>
+      <p class="mb-4"><strong>Email:</strong> <a href="mailto:registrar@ustc.ac.bd" class="text-success">registrar@ustc.ac.bd</a></p>
+    </div>
+
+    <div class="social-links mb-4">
+      <a href="https://web.facebook.com/ustc.edu1992?_rdc=1&_rdr" target="_blank" class="btn btn-success rounded-circle me-2"><i class="fab fa-facebook-f"></i></a>
+      <a href="https://www.youtube.com/@ustc1992" target="_blank" class="btn btn-success rounded-circle me-2"><i class="fab fa-youtube"></i></a>
+      <a href="https://www.instagram.com/ustcbd/" target="_blank" class="btn btn-success rounded-circle me-2"><i class="fab fa-instagram"></i></a>
+      <a href="https://www.linkedin.com/school/university-of-science-and-technology-chittagong/posts/?feedView=all" target="_blank" class="btn btn-success rounded-circle"><i class="fab fa-linkedin-in"></i></a>
+    </div>
+
+    <hr class="my-4">
+    <p class="small mb-0">&copy; 2026 Faculty of Science, Engineering & Technology. All rights reserved.</p>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+
+</body>
+</html>
