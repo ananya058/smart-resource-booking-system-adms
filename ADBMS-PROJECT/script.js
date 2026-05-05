@@ -12,7 +12,116 @@ const departmentBadge = document.getElementById("departmentBadge");
 const departmentContent = document.getElementById("departmentContent");
 const departmentIntro = document.getElementById("departmentIntro");
 
-let bookings = [];
+// API Base URL
+const API_BASE = 'http://localhost:8000/api';
+
+// Load data on page load
+document.addEventListener('DOMContentLoaded', function() {
+    loadRooms();
+    loadBookings();
+});
+
+// API Helper Functions
+async function apiRequest(endpoint, options = {}) {
+    try {
+        const response = await fetch(`${API_BASE}${endpoint}`, {
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            },
+            ...options
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || `HTTP ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('API Error:', error);
+        alert('Error: ' + error.message);
+        throw error;
+    }
+}
+
+// Load rooms from database
+async function loadRooms() {
+    try {
+        const rooms = await apiRequest('/rooms');
+        const roomSelect = document.getElementById("resource");
+
+        // Clear existing options except the first one
+        roomSelect.innerHTML = '<option value="">Select Room</option>';
+
+        // Add rooms from database
+        rooms.forEach(room => {
+            const option = document.createElement('option');
+            option.value = room.id;
+            option.textContent = room.name;
+            roomSelect.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Failed to load rooms:', error);
+        // Fallback to default rooms if API fails
+        loadDefaultRooms();
+    }
+}
+
+// Fallback function for default rooms
+function loadDefaultRooms() {
+    const roomSelect = document.getElementById("resource");
+    const defaultRooms = [
+        'Room 107', 'Room 307', 'Lab 401', 'Lab 402', 'Lab 403', 'Lab 404',
+        'Room 1403', 'Room 1404', 'Room 1405', 'Room 1407', 'Room 1503',
+        'Room 1504', 'Room 1505', 'Room 1507', 'Room 1603', 'Room 1604',
+        'Room 1605', 'Room 1607'
+    ];
+
+    roomSelect.innerHTML = '<option value="">Select Room</option>';
+    defaultRooms.forEach(room => {
+        const option = document.createElement('option');
+        option.value = room;
+        option.textContent = room;
+        roomSelect.appendChild(option);
+    });
+}
+
+// Load bookings from database
+async function loadBookings() {
+    try {
+        const bookings = await apiRequest('/bookings');
+        displayBookings(bookings);
+    } catch (error) {
+        console.error('Failed to load bookings:', error);
+        table.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Failed to load bookings</td></tr>';
+    }
+}
+
+// Display bookings in table
+function displayBookings(bookings) {
+    table.innerHTML = '';
+
+    if (bookings.length === 0) {
+        table.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No bookings found</td></tr>';
+        return;
+    }
+
+    bookings.forEach(booking => {
+        const row = document.createElement('tr');
+        const startDate = new Date(booking.start_time);
+        const endDate = new Date(booking.end_time);
+
+        row.innerHTML = `
+            <td>${booking.room_name}</td>
+            <td>${booking.faculty_name}</td>
+            <td>${booking.purpose}</td>
+            <td>${startDate.toLocaleString()}</td>
+            <td>${endDate.toLocaleString()}</td>
+        `;
+        table.appendChild(row);
+    });
+}
 
 const departmentData = {
     cse: {
@@ -258,50 +367,53 @@ aboutBtn.addEventListener("click", function() {
     }
 });
 
-form.addEventListener("submit", function(e) {
+// Form submission handler
+form.addEventListener("submit", async function(e) {
     e.preventDefault();
 
     const resource = document.getElementById("resource").value;
     const user = document.getElementById("user").value;
     const purpose = document.getElementById("purpose").value;
+    const startTime = document.getElementById("startTime").value;
+    const endTime = document.getElementById("endTime").value;
 
-    const start = new Date(document.getElementById("startTime").value);
-    const end = new Date(document.getElementById("endTime").value);
-
-    if (!resource || !user) {
-        alert("Please fill all fields!");
+    // Validate required fields
+    if (!resource || !user || !startTime || !endTime) {
+        alert("Please fill all required fields!");
         return;
     }
+
+    const start = new Date(startTime);
+    const end = new Date(endTime);
 
     if (end <= start) {
         alert("End time must be after start time!");
         return;
     }
 
-    // Conflict check
-    for (let booking of bookings) {
-        if (
-            booking.resource === resource &&
-            start < booking.end &&
-            end > booking.start
-        ) {
-            alert("⚠ Time conflict detected!");
-            return;
-        }
+    try {
+        // Create booking via API
+        const bookingData = {
+            room_id: parseInt(resource),
+            faculty_name: user,
+            purpose: purpose,
+            start_time: startTime,
+            end_time: endTime
+        };
+
+        const newBooking = await apiRequest('/bookings', {
+            method: 'POST',
+            body: JSON.stringify(bookingData)
+        });
+
+        alert("Booking Successful!");
+        form.reset();
+
+        // Reload bookings to show the new one
+        loadBookings();
+
+    } catch (error) {
+        // Error handling is done in apiRequest function
+        console.error('Booking failed:', error);
     }
-
-    bookings.push({ resource, user, purpose, start, end });
-
-    table.innerHTML += `
-        <tr>
-            <td>${resource}</td>
-            <td>${user}</td>
-            <td>${purpose}</td>
-            <td>${start.toLocaleString()}</td>
-            <td>${end.toLocaleString()}</td>
-        </tr>
-    `;
-
-    alert("Booking Successful!");
-    form.reset();
 });
