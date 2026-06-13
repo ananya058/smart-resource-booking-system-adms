@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FSET — Room Booking System | USTC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- TOAST -->
+<div id="toast-container"></div>
+
+<!-- GALLERY MODAL -->
+<div id="galleryModal" class="gallery-modal">
+  <div class="gallery-modal-content">
+    <button class="gallery-modal-close" onclick="closeGallery()">✕</button>
+    <img id="galleryImg" src="" alt="Gallery image" class="gallery-modal-img">
+    <div class="gallery-modal-nav">
+      <button onclick="prevGallery()" class="gallery-nav-btn">❮</button>
+      <span id="galleryCounter"></span>
+      <button onclick="nextGallery()" class="gallery-nav-btn">❯</button>
+    </div>
+  </div>
+</div>
+
+<!-- Scroll Top -->
+<button id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">USTC <span>· Faculty of Science, Engineering & Technology</span></div>
+  <div class="nav-links">
+    <a onclick="showSection('home')" id="nav-home" class="active">Home</a>
+    <a onclick="showSection('about')" id="nav-about">About</a>
+    <div class="nav-dropdown">
+      <a>Department ▾</a>
+      <div class="dd-menu">
+        <a onclick="showDepartment('cse')">💻 CSE</a>
+        <a onclick="showDepartment('eee')">⚡ EEE</a>
+        <a onclick="showDepartment('ete')">📡 ETE</a>
+      </div>
+    </div>
+    <a onclick="showSection('contact')" id="nav-contact">Contact</a>
+  </div>
+  <div class="nav-actions">
+    <button class="theme-btn" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+    <button class="book-nav-btn" onclick="showSection('booking')">📅 Book Room</button>
+  </div>
+  <button class="hamburger" onclick="toggleMobileMenu()">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <a onclick="showSection('home');toggleMobileMenu()">🏠 Home</a>
+  <a onclick="showSection('about');toggleMobileMenu()">ℹ️ About</a>
+  <a onclick="showDepartment('cse');toggleMobileMenu()">💻 CSE</a>
+  <a onclick="showDepartment('eee');toggleMobileMenu()">⚡ EEE</a>
+  <a onclick="showDepartment('ete');toggleMobileMenu()">📡 ETE</a>
+  <a onclick="showSection('contact');toggleMobileMenu()">📞 Contact</a>
+  <a onclick="showSection('booking');toggleMobileMenu()">📅 Book Room</a>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-container">
+    <div class="hero-image-container">
+      <img id="heroImg" src="Gallery/USTC-Building-scaled.jpg" alt="FSET Campus">
+      <div class="hero-overlay">
+        <div class="hero-badge">University of Science & Technology Chittagong</div>
+        <h1 class="hero-title">Faculty of Science,<br>Engineering & Technology</h1>
+        <p class="hero-description">Smart resource booking for classrooms and labs — schedule rooms, avoid conflicts, and manage FSET spaces efficiently.</p>
+        <div class="hero-actions">
+          <button class="hero-button" onclick="showSection('booking')">📅 Book a Room Now</button>
+          <button class="hero-link" onclick="showSection('about')">Learn More</button>
+        </div>
+      </div>
+    </div>
+    <div class="hero-nav">
+      <button onclick="prevHero()" class="hero-nav-btn">❮</button>
+      <span id="heroCounter">1 / 14</span>
+      <button onclick="nextHero()" class="hero-nav-btn">❯</button>
+    </div>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat-item">
+      <div class="stat-num" id="stat-rooms">18</div>
+      <div class="stat-label">Total Rooms & Labs</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" id="stat-bookings">0</div>
+      <div class="stat-label">Active Bookings</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">3</div>
+      <div class="stat-label">Departments</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">~650</div>
+      <div class="stat-label">Students Enrolled</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">1992</div>
+      <div class="stat-label">Est. Year</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main>
+
+  <!-- HOME / DASHBOARD -->
+  <section id="home" class="section active">
+    <div class="section-header">
+      <div>
+        <h2>Welcome to FSET</h2>
+        <p>Quick overview of the room booking system for today</p>
+      </div>
+      <div class="section-pill" id="todayDate"></div>
+    </div>
+
+    <!-- Quick Action Cards -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1.25rem;margin-bottom:2.5rem;">
+      <div class="card" style="cursor:pointer;border-left:4px solid var(--green);" onclick="showSection('booking')">
+        <div style="font-size:2rem;margin-bottom:8px;">📅</div>
+        <div style="font-weight:700;font-size:1rem;">Book a Room</div>
+        <div style="font-size:0.85rem;color:var(--text3);margin-top:4px;">Reserve classrooms & labs</div>
+      </div>
+      <div class="card" style="cursor:pointer;" onclick="showSection('about')">
+        <div style="font-size:2rem;margin-bottom:8px;">🏫</div>
+        <div style="font-weight:700;font-size:1rem;">About FSET</div>
+        <div style="font-size:0.85rem;color:var(--text3);margin-top:4px;">History and gallery</div>
+      </div>
+      <div class="card" style="cursor:pointer;" onclick="showDepartment('cse')">
+        <div style="font-size:2rem;margin-bottom:8px;">💻</div>
+        <div style="font-weight:700;font-size:1rem;">Departments</div>
+        <div style="font-size:0.85rem;color:var(--text3);margin-top:4px;">CSE, EEE, ETE courses</div>
+      </div>
+      <div class="card" style="cursor:pointer;" onclick="showSection('contact')">
+        <div style="font-size:2rem;margin-bottom:8px;">📞</div>
+        <div style="font-weight:700;font-size:1rem;">Contact Us</div>
+        <div style="font-size:0.85rem;color:var(--text3);margin-top:4px;">Get in touch with USTC</div>
+      </div>
+    </div>
+
+    <!-- Today's bookings -->
+    <div class="card">
+      <h4 style="font-weight:700;margin-bottom:1.25rem;font-size:1rem;">📋 Today's Bookings</h4>
+      <div id="todayBookings" style="color:var(--text3);font-size:0.9rem;">Loading…</div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="section">
+    <div class="section-header">
+      <div>
+        <h2>About FSET</h2>
+        <p>The Faculty of Science, Engineering & Technology at USTC</p>
+      </div>
+      <div class="section-pill">Est. 1992</div>
+    </div>
+    <div class="about-grid">
+      <div class="card about-text">
+        <h3>University of Science and Technology Chittagong</h3>
+        <p>USTC is located at the picturesque site near Foy's Lake, Chittagong. Since its inception, this institution has expanded a new sphere and scope in the industrial fields of medicine, pharmaceutical and biological sciences, engineering and technology, and business administration.</p>
+        <p>The Faculty of Science, Engineering & Technology (FSET) is home to three dynamic departments — CSE, EEE, and ETE — offering undergraduate programs designed to develop skilled engineers and researchers for the modern world.</p>
+        <div class="about-features">
+          <div class="feat-tag">Modern Labs</div>
+          <div class="feat-tag">Expert Faculty</div>
+          <div class="feat-tag">Smart Booking</div>
+          <div class="feat-tag">Industry Links</div>
+          <div class="feat-tag">3 Departments</div>
+          <div class="feat-tag">Digital Campus</div>
+        </div>
+      </div>
+      <div class="about-img-wrap">
+        <img src="Gallery/USTC-Building-scaled.jpg" alt="USTC Main Campus" style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius);">
+        <div class="about-img-badge">🏫 USTC Main Campus — Foy's Lake, Chittagong</div>
+      </div>
+    </div>
+
+    <h3 style="font-weight:700;margin-bottom:1.25rem;font-size:1.25rem;color:var(--text);">📸 Photo Gallery</h3>
+    
+    <!-- Gallery Tabs -->
+    <div class="gallery-tabs">
+      <div class="gallery-tab active" onclick="showGalleryTab('campus', this)">🏫 Campus Outdoor</div>
+      <div class="gallery-tab" onclick="showGalleryTab('cse', this)">💻 CSE Dept.</div>
+      <div class="gallery-tab" onclick="showGalleryTab('industrial', this)">🏭 Industrial Visit</div>
+      <div class="gallery-tab" onclick="showGalleryTab('seminar', this)">📍 Seminar Room</div>
+      <div class="gallery-tab" onclick="showGalleryTab('classroom', this)">📖 Classrooms</div>
+      <div class="gallery-tab" onclick="showGalleryTab('labs', this)">🔬 Labs</div>
+      <div class="gallery-tab" onclick="showGalleryTab('admission', this)">📋 Admission Info</div>
+    </div>
+    
+    <!-- Gallery Grid -->
+    <div class="gallery-grid" id="galleryGridContainer">
+      <!-- Dynamically populated -->
+    </div>
+  </section>
+
+  <!-- ROOM BOOKING -->
+  <section id="booking" class="section">
+    <div class="section-header">
+      <div>
+        <h2>Book a Room</h2>
+        <p>Reserve classrooms and labs — conflicts are detected automatically</p>
+      </div>
+      <div class="section-pill">FSET Booking System</div>
+    </div>
+
+    <!-- Quick Availability Checker -->
+    <div class="avail-checker">
+      <h4>⚡ Quick Availability — Right Now</h4>
+      <div id="availResults" class="avail-results">
+        <span style="font-size:0.85rem;color:var(--text2);">Checking availability…</span>
+      </div>
+    </div>
+
+    <div class="booking-layout">
+      <div>
+        <form id="bookingForm" class="card" onsubmit="handleBooking(event)">
+          <div class="form-row">
+            <div class="field">
+              <label>Room / Lab</label>
+              <select id="resource" required onchange="onRoomChange()">
+                <option value="">Select a room…</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Faculty Name</label>
+              <input type="text" id="user" placeholder="Enter your full name" required>
+            </div>
+          </div>
+          <div class="field">
+            <label>Purpose</label>
+            <select id="purpose">
+              <option>Class</option>
+              <option>Lab</option>
+              <option>Meeting</option>
+              <option>Exam</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="field">
+              <label>Start Date & Time</label>
+              <input type="datetime-local" id="startTime" required>
+            </div>
+            <div class="field">
+              <label>End Date & Time</label>
+              <input type="datetime-local" id="endTime" required>
+            </div>
+          </div>
+          <button type="submit" class="btn-primary" id="submitBtn">📅 Confirm Booking</button>
+        </form>
+      </div>
+
+      <!-- Room Preview -->
+      <div class="room-preview" id="roomPreviewCard">
+        <div class="room-preview-img" id="roomPreviewImg">
+          <img src="Gallery/Floors_types.jpeg" alt="Room Preview" style="width:100%;height:100%;object-fit:cover;">
+        </div>
+        <div class="room-preview-info">
+          <div class="room-preview-name" id="roomPreviewName">Select a room</div>
+          <div class="room-preview-meta" id="roomPreviewMeta">Choose a room to see details</div>
+          <div id="roomStatusBadge" class="room-status-badge status-available">● Available</div>
+          <div class="room-capacity-bar" id="capBarWrap">
+            <div class="cap-label" id="capLabel">Capacity: —</div>
+            <div class="cap-track"><div class="cap-fill" id="capFill" style="width:0%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bookings Table -->
+    <div class="bookings-table-wrap">
+      <div class="table-header">
+        <h4>📋 Booking Records</h4>
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="Search by faculty, room…" oninput="filterBookings()">
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Room</th>
+              <th>Faculty</th>
+              <th>Purpose</th>
+              <th>Start</th>
+              <th>End</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="bookingTable">
+            <tr class="empty-row"><td colspan="7">No bookings yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEPARTMENT -->
+  <section id="department" class="section">
+    <div class="section-header">
+      <div>
+        <h2>Departments</h2>
+        <p>Course offerings by semester</p>
+      </div>
+    </div>
+    <div class="dept-tabs">
+      <div class="dept-tab active" onclick="showDeptTab('cse', this)">💻 CSE</div>
+      <div class="dept-tab" onclick="showDeptTab('eee', this)">⚡ EEE</div>
+      <div class="dept-tab" onclick="showDeptTab('ete', this)">📡 ETE</div>
+    </div>
+    <div id="deptIntroCard" class="dept-intro-card"></div>
+    <div class="semesters-grid" id="semestersGrid"></div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="section">
+    <div class="section-header">
+      <div>
+        <h2>Contact Us</h2>
+        <p>Reach out to USTC FSET offices</p>
+      </div>
+    </div>
+    <div class="contact-grid">
+      <div class="card">
+        <div class="contact-item">
+          <div class="contact-icon">📧</div>
+          <div>
+            <h5>General Inquiry</h5>
+            <a href="mailto:info@ustc.ac.bd">info@ustc.ac.bd</a>
+            <a href="tel:+8801810097025">+880 1810 097025</a>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">🏛️</div>
+          <div>
+            <h5>Registrar Office</h5>
+            <a href="mailto:registrar@ustc.ac.bd">registrar@ustc.ac.bd</a>
+            <a href="tel:+88031250908">+880 31 250 9008</a>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">💻</div>
+          <div>
+            <h5>Department of CSE</h5>
+            <a href="mailto:officecse@ustc.ac.bd">officecse@ustc.ac.bd</a>
+            <a href="tel:+8801810097025">+880 1810 097025-26</a>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">📍</div>
+          <div>
+            <h5>Campus Address</h5>
+            <p>USTC D Block, Foy's Lake</p>
+            <p>Zakir Hossain Road, Chittagong 4202</p>
+          </div>
+        </div>
+        <!-- Social -->
+        <div class="social-row" style="margin-top:1rem;">
+          <a href="https://web.facebook.com/ustc.edu1992" target="_blank" class="soc-btn" title="Facebook">f</a>
+          <a href="https://www.youtube.com/@ustc1992" target="_blank" class="soc-btn" title="YouTube">▶</a>
+          <a href="https://www.instagram.com/ustcbd/" target="_blank" class="soc-btn" title="Instagram">📷</a>
+          <a href="https://www.linkedin.com/school/university-of-science-and-technology-chittagong" target="_blank" class="soc-btn" title="LinkedIn">in</a>
+        </div>
+      </div>
+      <div class="map-placeholder">
+        <span>🗺️</span>
+        <p style="font-weight:600;font-size:1rem;color:var(--text);">Foy's Lake, Chittagong</p>
+        <p>USTC Main Campus</p>
+        <a href="https://maps.google.com/?q=USTC+Chittagong" target="_blank" style="color:var(--green);text-decoration:none;font-weight:600;font-size:0.9rem;">Open in Google Maps →</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <h3>USTC · FSET</h3>
+        <p>Faculty of Science, Engineering & Technology, University of Science and Technology Chittagong. Empowering engineers and innovators since 1992.</p>
+        <div class="social-row" style="margin-top:1rem;">
+          <a href="https://web.facebook.com/ustc.edu1992" target="_blank" class="soc-btn">f</a>
+          <a href="https://www.youtube.com/@ustc1992" target="_blank" class="soc-btn">▶</a>
+          <a href="https://www.instagram.com/ustcbd/" target="_blank" class="soc-btn">📷</a>
+          <a href="https://www.linkedin.com/school/university-of-science-and-technology-chittagong" target="_blank" class="soc-btn">in</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h5>Navigation</h5>
+        <a onclick="showSection('home')">Home</a>
+        <a onclick="showSection('about')">About</a>
+        <a onclick="showDepartment('cse')">CSE</a>
+        <a onclick="showDepartment('eee')">EEE</a>
+        <a onclick="showDepartment('ete')">ETE</a>
+        <a onclick="showSection('booking')">Book Room</a>
+      </div>
+      <div class="footer-col">
+        <h5>Contact</h5>
+        <a href="mailto:info@ustc.ac.bd">info@ustc.ac.bd</a>
+        <a href="mailto:registrar@ustc.ac.bd">registrar@ustc.ac.bd</a>
+        <a>+880 1810 097025</a>
+        <a>+880 31 250 9008</a>
+        <a href="https://www.ustc.ac.bd" target="_blank">www.ustc.ac.bd</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Faculty of Science, Engineering & Technology, USTC. All rights reserved.</span>
+      <span>EIIN: I36638 · Foy's Lake, Chittagong 4202</span>
+    </div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+
+</body>
+</html>
